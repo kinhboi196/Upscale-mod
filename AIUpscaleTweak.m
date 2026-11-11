@@ -112,21 +112,32 @@ static void *kAIULayerKey         = &kAIULayerKey;
 // size plausibly matches the physical screen. Deliberately stricter than a
 // bare minimum-size check — see the header comment on why a system
 // compositing layer must never be touched here.
+
 static BOOL AIULooksLikeGameLayer(CGSize nativeSize) {
-    if (nativeSize.width < kMinLayerDimension || nativeSize.height < kMinLayerDimension) {
+    if (nativeSize.width < kMinLayerDimension ||
+        nativeSize.height < kMinLayerDimension) {
         return NO;
     }
-    CGSize screen = UIScreen.mainScreen.nativeBounds.size; // already in pixels
-    if (screen.width <= 0 || screen.height <= 0) return NO;
 
-    CGFloat wRatio = nativeSize.width  / screen.width;
-    CGFloat hRatio = nativeSize.height / screen.height;
-    // Slack for safe-area exclusion, split view, etc., but require both
-    // axes to be close to full screen — rules out e.g. a large-but-square
-    // internal thumbnail/effect layer that happens to pass a flat minimum.
-    BOOL widthOK  = wRatio >= 0.5 && wRatio <= 1.05;
-    BOOL heightOK = hRatio >= 0.5 && hRatio <= 1.05;
-    return widthOK && heightOK;
+    CGSize screen = UIScreen.mainScreen.nativeBounds.size;
+
+    CGFloat screenLong = MAX(screen.width, screen.height);
+    CGFloat screenShort = MIN(screen.width, screen.height);
+
+    CGFloat layerLong = MAX(nativeSize.width, nativeSize.height);
+    CGFloat layerShort = MIN(nativeSize.width, nativeSize.height);
+
+    if (screenLong <= 0 || screenShort <= 0) {
+        return NO;
+    }
+
+    CGFloat longRatio = layerLong / screenLong;
+    CGFloat shortRatio = layerShort / screenShort;
+
+    BOOL longOK = longRatio >= 0.5 && longRatio <= 1.05;
+    BOOL shortOK = shortRatio >= 0.5 && shortRatio <= 1.05;
+
+    return longOK && shortOK;
 }
 
 #pragma mark - FXAA shader source (compiled at runtime, no .metallib needed)
