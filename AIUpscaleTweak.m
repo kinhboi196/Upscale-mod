@@ -80,7 +80,7 @@
 // reconstruct. 0.60–0.80 is a reasonable range on A19 Pro (iPhone 17 Pro)
 // for 60fps titles — its 6-core GPU has a Neural Accelerator per core plus
 // a 16-core Neural Engine, so there's real headroom above this range too.
-static const CGFloat kRenderScale = 0.72;
+static const CGFloat kRenderScale = 0.65;
 
 // Run an FXAA post-process pass after the MetalFX upscale, before present.
 // Adds one extra fullscreen render pass per frame — cheap on A19 Pro.
